@@ -1,9 +1,8 @@
 import streamlit as st
 from PIL import Image
 
-st.title("🎨 دمج الصور للأطفال")
+st.title(" دمج الصور ")
 
-st.write("ارفع صورتين وسنقوم بدمجهم معًا!")
 
 # رفع الصور
 img1_file = st.file_uploader("اختر الصورة الأولى", type=["png", "jpg"])
@@ -27,7 +26,7 @@ if img1_file and img2_file:
     # دمج الصور
     blended = Image.blend(img1, img2, alpha)
 
-    st.subheader("✨ الصورة الناتجة")
+    st.subheader(" الصورة الناتجة")
     st.image(blended)
 
     # تحميل الصورة
