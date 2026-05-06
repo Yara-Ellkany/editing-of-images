@@ -1,8 +1,7 @@
 import streamlit as st
-from PIL import Image
+from PIL import Image, ImageEnhance
 
-st.title(" دمج الصور ")
-
+st.title("دمج الصور")
 
 # رفع الصور
 img1_file = st.file_uploader("اختر الصورة الأولى", type=["png", "jpg"])
@@ -24,9 +23,23 @@ if img1_file and img2_file:
     alpha = st.slider("درجة الدمج", 0.0, 1.0, 0.5)
 
     # دمج الصور
-    blended = Image.blend(img1, img2, alpha)
+    blended = Image.blend(img1.convert("RGBA"), img2.convert("RGBA"), alpha).convert("RGB")
 
-    st.subheader(" الصورة الناتجة")
+    st.subheader(" تعديلات الصورة ")
+  
+
+    brightness = st.slider(" الإضاءة",    0.0, 3.0, 1.0, 0.1)
+    contrast   = st.slider(" التباين",     0.0, 3.0, 1.0, 0.1)
+    color      = st.slider(" الألوان",     0.0, 3.0, 1.0, 0.1)
+    sharpness  = st.slider(" الحدة",       0.0, 3.0, 1.0, 0.1)
+
+    # تطبيق التعديلات
+    blended = ImageEnhance.Brightness(blended).enhance(brightness)
+    blended = ImageEnhance.Contrast(blended).enhance(contrast)
+    blended = ImageEnhance.Color(blended).enhance(color)
+    blended = ImageEnhance.Sharpness(blended).enhance(sharpness)
+
+    st.subheader("الصورة الناتجة")
     st.image(blended)
 
     # تحميل الصورة
