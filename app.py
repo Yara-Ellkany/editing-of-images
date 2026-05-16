@@ -1,8 +1,47 @@
 import streamlit as st
-from PIL import Image
+from PIL import Image, ImageFilter
 import requests
 import io
- 
+import numpy as np
+
+def filter_vintage(img):
+    arr = np.array(img, dtype=np.float32)
+    arr[:, :, 0] = np.clip(arr[:, :, 0] * 1.1 + 20, 0, 255)
+    arr[:, :, 1] = np.clip(arr[:, :, 1] * 0.9 + 10, 0, 255)  
+    arr[:, :, 2] = np.clip(arr[:, :, 2] * 0.75,      0, 255)  
+    return Image.fromarray(arr.astype(np.uint8))
+
+def filter_bw(img):
+    return img.convert("L").convert("RGB")  
+
+def filter_cinema(img):
+    arr = np.array(img, dtype=np.float32)
+    arr[:, :, 0] = np.clip(arr[:, :, 0] * 0.9,  0, 255)  
+    arr[:, :, 2] = np.clip(arr[:, :, 2] * 1.15, 0, 255)  
+    bar = int(arr.shape[0] * 0.08)                      
+    arr[:bar, :, :] = 0
+    arr[-bar:, :, :] = 0
+    return Image.fromarray(arr.astype(np.uint8))
+
+def filter_warm(img):
+    arr = np.array(img, dtype=np.float32)
+    arr[:, :, 0] = np.clip(arr[:, :, 0] + 40, 0, 255)  
+    arr[:, :, 2] = np.clip(arr[:, :, 2] - 40, 0, 255)  
+    return Image.fromarray(arr.astype(np.uint8))
+
+def filter_sharp(img):
+    return img.filter(ImageFilter.SHARPEN)  
+
+FILTERS = {
+    "بدون ":       None,
+    "Vintage ":    filter_vintage,
+    "أبيض وأسود ": filter_bw,
+    "Cinema ":     filter_cinema,
+    "دافئ ":       filter_warm,
+    "حاد ":        filter_sharp,
+}
+# ──────────────────────────────
+
 st.title(" ضع نفسك في أي مكان!")
  
 api_key = st.text_input(" أدخل API Key من remove.bg:", type="password")
@@ -47,9 +86,15 @@ if person_file and bg_file and api_key:
  
         result = bg_img.copy()
         result.paste(person_resized, (x, y), person_resized)
+
+        st.subheader(" اختر فلتراً")
+        choice = st.radio("", list(FILTERS.keys()), horizontal=True)
+        filtered = result.convert("RGB")
+        if FILTERS[choice]:
+            filtered = FILTERS[choice](filtered)
  
         st.subheader("الصورة الناتجة")
-        st.image(result)
+        st.image(filtered)
  
         buf = io.BytesIO()
         result.convert("RGB").save(buf, format="PNG")
