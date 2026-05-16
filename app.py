@@ -54,7 +54,7 @@ if person_file and bg_file and api_key:
         buf = io.BytesIO()
         result.convert("RGB").save(buf, format="PNG")
         buf.seek(0)
-        st.download_button("⬇️ تحميل الصورة", buf, file_name="result.png", mime="image/png")
+        st.download_button(" تحميل الصورة", buf, file_name="result.png", mime="image/png")
     else:
         st.error(f" خطأ: {response.status_code} - تأكد من صحة الـ API Key")
  
